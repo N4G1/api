@@ -3,6 +3,7 @@ package org.demo.service;
 import com.jasongoodwin.monads.Try;
 import org.demo.model.AvtaleResponse;
 import org.demo.model.AvtaleStatus;
+import org.demo.model.NyAvtale;
 
 // Integrasjonslag
 public class Service {
@@ -10,26 +11,26 @@ public class Service {
     public Fagsystem fagsystem = new Fagsystem();
     public Brevtjeneste brevtjeneste = new Brevtjeneste();
 
-    public Try<AvtaleResponse> opprettAvtale() {
+    public Try<AvtaleResponse> opprettAvtale(NyAvtale nyAvtale) {
 
         // Vi kan enten løse det på funksjonell måte, ved å chaine hver av kallene
-        return fagsystem.opprettKunde(1)
-                .flatMap(kundenummer -> fagsystem.opprettAvtale(kundenummer)
-                        .flatMap(avtaleummer -> brevtjeneste.sendAvtaleTilKunde(avtaleummer, kundenummer)
-                                .flatMap(nyAvtaleStatus -> fagsystem.oppdaterAvtaleStatus(nyAvtaleStatus)
-                                        .flatMap(x -> Try.successful(new AvtaleResponse(avtaleummer, AvtaleStatus.AVTALE_SENDT))
-                                        )
-                                )
-                        )
-                );
+//        return fagsystem.opprettKunde(1)
+//                .flatMap(kundenummer -> fagsystem.opprettAvtale(kundenummer)
+//                        .flatMap(avtaleummer -> brevtjeneste.sendAvtaleTilKunde(avtaleummer, kundenummer)
+//                                .flatMap(nyAvtaleStatus -> fagsystem.oppdaterAvtaleStatus(nyAvtaleStatus)
+//                                        .flatMap(x -> Try.successful(new AvtaleResponse(avtaleummer, AvtaleStatus.AVTALE_SENDT))
+//                                        )
+//                                )
+//                        )
+//                );
 
         // Eller ved å kalle de individuelt.
 
-//        int kundenummer = fagsystem.opprettKunde(1).orElseThrow(RuntimeException::new);
-//        int avtalenummer = fagsystem.opprettAvtale(kundenummer).orElseThrow(RuntimeException::new);
-//        brevtjeneste.sendAvtaleTilKunde(avtalenummer, kundenummer).orElseThrow(RuntimeException::new);
-//        AvtaleStatus nyAvtaleStatus = fagsystem.oppdaterAvtaleStatus(AvtaleStatus.AVTALE_SENDT).orElseThrow(RuntimeException::new);
-//        return Try.successful(new AvtaleResponse(avtalenummer, nyAvtaleStatus));
+        int kundenummer = fagsystem.opprettKunde(1).orElseThrow(RuntimeException::new);
+        int avtalenummer = fagsystem.opprettAvtale(kundenummer).orElseThrow(RuntimeException::new);
+        brevtjeneste.sendAvtaleTilKunde(avtalenummer, kundenummer).orElseThrow(RuntimeException::new);
+        AvtaleStatus nyAvtaleStatus = fagsystem.oppdaterAvtaleStatus(AvtaleStatus.AVTALE_SENDT).orElseThrow(RuntimeException::new);
+        return Try.successful(new AvtaleResponse(avtalenummer, nyAvtaleStatus));
     }
 
     /*
@@ -72,7 +73,7 @@ public class Service {
      Problem nr. 3:
 
 
-     Curl as a solution, out of the box thinking.
+     cron job as a solution, out of the box thinking.
      Api delete call to rollback/revert data, inside the box thinking
 
      * */

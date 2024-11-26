@@ -5,7 +5,7 @@ import org.demo.model.AvtaleStatus;
 
 // Siden vi kan mocke oppførselen til hele denne tjenesten, velger jeg å skrive funksjonaliteten gjennom metoder istedenfor mocka REST Requests/Responses.
 // Hadde jeg gjort dette i virkeligheten ville jeg opprettet en klient-wrapper som letteregjør bruken av HttpRequest metoden.
-// Funksjonaliteten hadde blitt cirka samme som koden nedenfor, med variabler for ulike URI, metoder og errorhåndtering.
+// Funksjonaliteten hadde blitt cirka samme som koden nedenfor, med variabler for ulike URI og exceptions.
 
 /*
         try (HttpClient client = HttpClient.newHttpClient()) {
