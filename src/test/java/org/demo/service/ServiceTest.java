@@ -48,5 +48,56 @@ class ServiceTest {
         verify(mockBrevtjeneste).sendAvtaleTilKunde(2002, 1001);
         verify(mockFagsystem).oppdaterAvtaleStatus(AvtaleStatus.AVTALE_SENDT);
     }
+
+    @Test
+    void testOpprettAvtale_FailureOnOpprettKunde() {
+        when(mockFagsystem.opprettKunde(1)).thenThrow(new RuntimeException());
+
+        assertThrows(RuntimeException.class, () -> service.opprettAvtale());
+
+        verify(mockFagsystem).opprettKunde(1);
+        verifyNoMoreInteractions(mockFagsystem, mockBrevtjeneste);
+    }
+
+    @Test
+    void testOpprettAvtale_FailureOnOpprettAvtale() {
+        when(mockFagsystem.opprettKunde(1)).thenReturn(Try.successful(1001));
+        when(mockFagsystem.opprettAvtale(1001)).thenThrow(new RuntimeException());
+
+        assertThrows(RuntimeException.class, () -> service.opprettAvtale());
+
+        verify(mockFagsystem).opprettKunde(1);
+        verify(mockFagsystem).opprettAvtale(1001);
+        verifyNoMoreInteractions(mockFagsystem, mockBrevtjeneste);
+    }
+
+    @Test
+    void testOpprettAvtale_FailureOnSendAvtaleTilKunde() {
+        when(mockFagsystem.opprettKunde(1)).thenReturn(Try.successful(1001));
+        when(mockFagsystem.opprettAvtale(1001)).thenReturn(Try.successful(2002));
+        when(mockBrevtjeneste.sendAvtaleTilKunde(2002, 1001)).thenThrow(new RuntimeException());
+
+        assertThrows(RuntimeException.class, () -> service.opprettAvtale());
+
+        verify(mockFagsystem).opprettKunde(1);
+        verify(mockFagsystem).opprettAvtale(1001);
+        verify(mockBrevtjeneste).sendAvtaleTilKunde(2002, 1001);
+        verifyNoMoreInteractions(mockFagsystem);
+    }
+
+    @Test
+    void testOpprettAvtale_FailureOnUpdateStatus() {
+        when(mockFagsystem.opprettKunde(1)).thenReturn(Try.successful(1001));
+        when(mockFagsystem.opprettAvtale(1001)).thenReturn(Try.successful(2002));
+        when(mockBrevtjeneste.sendAvtaleTilKunde(2002, 1001)).thenReturn(Try.successful(AvtaleStatus.AVTALE_SENDT));
+        when(mockFagsystem.oppdaterAvtaleStatus(AvtaleStatus.AVTALE_SENDT)).thenThrow(new RuntimeException());
+
+        assertThrows(RuntimeException.class, () -> service.opprettAvtale());
+
+        verify(mockFagsystem).opprettKunde(1);
+        verify(mockFagsystem).opprettAvtale(1001);
+        verify(mockBrevtjeneste).sendAvtaleTilKunde(2002, 1001);
+        verify(mockFagsystem).oppdaterAvtaleStatus(AvtaleStatus.AVTALE_SENDT);
+    }
 }
 
