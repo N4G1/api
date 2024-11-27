@@ -1,5 +1,6 @@
 package org.demo.controller;
 
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -15,15 +16,10 @@ public class Controller {
     Service service = new Service();
 
     @POST
+    @Valid
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public AvtaleResponse opprettAvtale(NyAvtale nyAvtale) {
-        System.out.println(nyAvtale);
-        return service.opprettAvtale(nyAvtale).getUnchecked();
-//        if(result.isSuccess()) {
-//            return Response.ok(service.opprettAvtale().getUnchecked()).build();
-//        } else {
-//            return Response.s().build();
-//        }
+        return service.opprettAvtale(nyAvtale);
     }
 }

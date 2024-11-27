@@ -3,6 +3,7 @@ package org.demo;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 
 import java.net.URI;
 
@@ -12,7 +13,8 @@ public class Server {
 
     public static HttpServer startServer() {
         // Create a resource config that scans for JAX-RS resources and providers in the package
-        final ResourceConfig rc = new ResourceConfig().packages("org.demo");
+        final ResourceConfig rc = new ResourceConfig().packages("org.demo")
+                .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
         return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
 
