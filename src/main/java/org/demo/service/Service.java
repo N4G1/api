@@ -1,9 +1,6 @@
 package org.demo.service;
 
-import com.jasongoodwin.monads.Try;
-import org.demo.model.AvtaleResponse;
-import org.demo.model.AvtaleStatus;
-import org.demo.model.NyAvtale;
+import org.demo.model.*;
 
 // Integrasjonslag
 public class Service {
@@ -11,34 +8,18 @@ public class Service {
     public Fagsystem fagsystem = new Fagsystem();
     public Brevtjeneste brevtjeneste = new Brevtjeneste();
 
-    public Try<AvtaleResponse> opprettAvtale(NyAvtale nyAvtale) {
+    public AvtaleResponse opprettAvtale(NyAvtale nyAvtale) {
+        Kunde kunde = nyAvtale.toKunde();
+        Avtale avtale = nyAvtale.toAvtale();
 
-        // Vi kan enten løse det på funksjonell måte, ved å chaine hver av kallene
-//        return fagsystem.opprettKunde(1)
-//                .flatMap(kundenummer -> fagsystem.opprettAvtale(kundenummer)
-//                        .flatMap(avtaleummer -> brevtjeneste.sendAvtaleTilKunde(avtaleummer, kundenummer)
-//                                .flatMap(nyAvtaleStatus -> fagsystem.oppdaterAvtaleStatus(nyAvtaleStatus)
-//                                        .flatMap(x -> Try.successful(new AvtaleResponse(avtaleummer, AvtaleStatus.AVTALE_SENDT))
-//                                        )
-//                                )
-//                        )
-//                );
-
-        // Eller ved å kalle de individuelt.
-
-        int kundenummer = fagsystem.opprettKunde(1).orElseThrow(RuntimeException::new);
-        int avtalenummer = fagsystem.opprettAvtale(kundenummer).orElseThrow(RuntimeException::new);
-        brevtjeneste.sendAvtaleTilKunde(avtalenummer, kundenummer).orElseThrow(RuntimeException::new);
-        AvtaleStatus nyAvtaleStatus = fagsystem.oppdaterAvtaleStatus(AvtaleStatus.AVTALE_SENDT).orElseThrow(RuntimeException::new);
-        return Try.successful(new AvtaleResponse(avtalenummer, nyAvtaleStatus));
+        int kundenummer = fagsystem.opprettKunde(kunde);
+        int avtalenummer = fagsystem.opprettAvtale(kundenummer, avtale);
+        brevtjeneste.sendAvtaleTilKunde(avtalenummer, kundenummer, avtale, kunde);
+        AvtaleStatus nyAvtaleStatus = fagsystem.oppdaterAvtaleStatus(AvtaleStatus.AVTALE_SENDT);
+        return new AvtaleResponse(avtalenummer, nyAvtaleStatus);
     }
 
     /*
-     Jeg bruker Try monaden som jeg er kjent med fra Scala og Rust programmeringsspråkene.
-     Try monaden er veldig likt Optional monaden, bare at istedenfor (None, Some) så får man (Success, Failure),
-     som hjelper i å propagere erroren og verdien videre i kjeden mens implementasjonen holdes konstant. Kan leses mer om den her:
-     https://medium.com/@afcastano/monads-for-java-developers-part-2-the-result-and-log-monads-a9ecc0f231bb
-
      Det er 2 ulike framgangsmåter man kan ta ved implementasjonen av Integrasjonslaget:
 
      1)
@@ -47,9 +28,12 @@ public class Service {
 
      2)
      Dersom Fagsystemet er en whitebox, enten vår egen implementasjon eller implementasjon som vi har full tilgang til:
-     Da slipper vi å definere våre egne exceptions. Ved å bruke Try monaden kan vi la errors/exceptions propagere gjennom
-     Integrasjonslaget ut til koden vår. Dette forenkler Integrasjonslaget ved å slippe å reimplementere errorene.
+     Da slipper vi å definere våre egne exceptions. Vi kan la errors/exceptions propagere gjennom
+     Integrasjonslaget ut til controller. Dette forenkler Integrasjonslaget ved å slippe å reimplementere errorene.
+     Eneste vi må gjøre er å holde ExceptionHandling klassen oppdatert.
 
+
+     Kommentarer til oppgaven:
 
      Jeg ser et stor integrasjonsproblem med dataflyten og måten sekvensdiagrammet for dette integrasjonslaget er satt opp.
      Dette kommer av erfaring med lignende systemer, apier generelt og erfaringen innen integrasjonen mellom mikrotjenester.

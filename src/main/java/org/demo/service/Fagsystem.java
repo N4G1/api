@@ -1,7 +1,8 @@
 package org.demo.service;
 
-import com.jasongoodwin.monads.Try;
+import org.demo.model.Avtale;
 import org.demo.model.AvtaleStatus;
+import org.demo.model.Kunde;
 
 // Siden vi kan mocke oppførselen til hele denne tjenesten, velger jeg å skrive funksjonaliteten gjennom metoder istedenfor mocka REST Requests/Responses.
 // Hadde jeg gjort dette i virkeligheten ville jeg opprettet en klient-wrapper som letteregjør bruken av HttpRequest metoden.
@@ -25,27 +26,15 @@ import org.demo.model.AvtaleStatus;
 */
 public class Fagsystem {
 
-    public Try<Integer> opprettKunde(int nr) {
-        if(nr < 0) {
-          return Try.failure(new Exception("g"));
-        } else {
-            return Try.successful(nr);
-        }
+    public int opprettKunde(Kunde kunde) {
+        return 1337;
     }
 
-    public Try<Integer> opprettAvtale(int kundenummer) {
-        if(kundenummer < 0) {
-            return Try.failure(new Exception("g"));
-        } else {
-            return Try.successful(kundenummer);
-        }
+    public int opprettAvtale(int kundenummer, Avtale avtale) {
+        return 42;
     }
 
-    public Try<AvtaleStatus> oppdaterAvtaleStatus(AvtaleStatus avtaleStatus) {
-        if(avtaleStatus == null) {
-            return Try.failure(new Exception("g"));
-        } else {
-            return Try.successful(avtaleStatus);
-        }
+    public AvtaleStatus oppdaterAvtaleStatus(AvtaleStatus avtaleStatus) {
+        return avtaleStatus;
     }
 }

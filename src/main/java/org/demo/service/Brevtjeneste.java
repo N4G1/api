@@ -1,15 +1,12 @@
 package org.demo.service;
 
-import com.jasongoodwin.monads.Try;
+import org.demo.model.Avtale;
 import org.demo.model.AvtaleStatus;
+import org.demo.model.Kunde;
 
 // Brevtjeneste
 public class Brevtjeneste {
-    public Try<AvtaleStatus> sendAvtaleTilKunde(int avtalenummer, int kundenummer) {
-        if(avtalenummer < 0 || kundenummer < 0) {
-            return Try.failure(new IllegalArgumentException("avtalenummer or kundenummer is invalid"));
-        } else {
-            return Try.successful(AvtaleStatus.AVTALE_SENDT);
-        }
+    public AvtaleStatus sendAvtaleTilKunde(int avtalenummer, int kundenummer, Avtale avtale, Kunde kunde) {
+        return AvtaleStatus.AVTALE_SENDT;
     }
 }
