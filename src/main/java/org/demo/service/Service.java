@@ -54,11 +54,10 @@ public class Service {
      Løsningen er som over, å få returnert hele Avtale-objektet fra "Opprett avtale" metoden slik at selve Avtale-objektet
      kan brukes videre ned i kjeden og dataintegriteten opprettholdes på tvers av apiene.
 
-     Problem nr. 3:
-
-
-     cron job as a solution, out of the box thinking.
-     Api delete call to rollback/revert data, inside the box thinking
+     Angående "mismatch mellom det som informeres kunde og status på avtalen i fagsystemet" så er det litt vanskelig å fikse uten en state.
+     Spørs hvor stor toleranse vi har for desyncen. Vi kan for eksempel lage en cron job med et script som sjekker og prøver å synce dataen på tvers
+     av apiene. Eller hvis vi må ha dataen i sync hele tiden, da må vi innføre noe form for global state, som kan aktivt holde styr
+     og basert på informasjonen prøve å synce dataen kontinuerlig.
 
      * */
 
